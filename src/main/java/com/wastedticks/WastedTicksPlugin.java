@@ -1,15 +1,21 @@
 package com.wastedticks;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.inject.Provides;
+
 import net.runelite.api.Client;
 import net.runelite.api.Friend;
 import net.runelite.api.GameState;
@@ -23,8 +29,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @PluginDescriptor(
 	name = "Wasted Ticks Tracker",
@@ -250,10 +254,14 @@ public class WastedTicksPlugin extends Plugin
 		{
 			try
 			{
-				tickData = gson.fromJson(tickJson, TICK_DATA_TYPE);
-				if (tickData == null)
+				Map<String, Object> raw = gson.fromJson(tickJson, new TypeToken<Map<String, Object>>(){}.getType());
+				tickData = new HashMap<>();
+				if (raw != null)
 				{
-					tickData = new HashMap<>();
+					for (Map.Entry<String, Object> entry : raw.entrySet())
+					{
+						tickData.put(entry.getKey(), ((Number) entry.getValue()).longValue());
+					}
 				}
 			}
 			catch (Exception e)
