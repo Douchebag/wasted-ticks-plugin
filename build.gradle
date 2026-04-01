@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    maven { url = 'https://repo.runelite.net' }
+    mavenCentral()
+}
+
+def runeLiteVersion = 'latest.release'
+
+dependencies {
+    compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
+    testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
+}
+
+group = 'com.wastedticks'
+version = '1.0-SNAPSHOT'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.release.set(11)
+}
+
+tasks.register('runClient', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.wastedticks.WastedTicksPluginTest'
+    jvmArgs = [
+        '-ea',
+        '--add-opens=java.base/java.net=ALL-UNNAMED',
+        '--add-opens=java.base/java.io=ALL-UNNAMED',
+        '--add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED',
+        '-Dsun.java2d.metal=false',
+        '-Dsun.java2d.opengl=true'
+    ]
+}
